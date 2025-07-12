@@ -1,0 +1,45 @@
+name: MERN CI/CD
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-push-client:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./client
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Docker Login
+      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+    - name: Build Docker Image (client)
+      run: docker build -t ${{ secrets.DOCKER_USERNAME }}/mern-client:latest .
+
+    - name: Push Docker Image (client)
+      run: docker push ${{ secrets.DOCKER_USERNAME }}/mern-client:latest
+
+  build-and-push-server:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: ./server
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+
+    - name: Docker Login
+      run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
+
+    - name: Build Docker Image (server)
+      run: docker build -t ${{ secrets.DOCKER_USERNAME }}/mern-server:latest .
+
+    - name: Push Docker Image (server)
+      run: docker push ${{ secrets.DOCKER_USERNAME }}/mern-server:latest
